@@ -1,0 +1,39 @@
+
+name: Build Minecraft Plugin
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download repository
+        uses: actions/checkout@v4
+
+      - name: Extract ZIP
+        run: |
+          mkdir source
+          unzip Madosy-Paper-Plugin.zip -d source
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build JAR
+        run: |
+          cd source
+          POM=$(find . -name pom.xml -print -quit)
+          cd "$(dirname "$POM")"
+          mvn clean package
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: Madosy-Paper-Plugin-JAR
+          path: source/**/target/*.jar
+          
